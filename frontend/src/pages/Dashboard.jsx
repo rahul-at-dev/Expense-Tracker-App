@@ -1,9 +1,8 @@
-
 import { useEffect, useState } from 'react'
 import analyticsService from '../services/analyticsService'
 import budgetService from '../services/budgetService'
 import BudgetProgress from '../components/BudgetProgress'
-
+import notificationService from '../services/notificationService'
 import {
   PieChart,
   Pie,
@@ -39,6 +38,9 @@ export default function Dashboard() {
     loadAll()
   }, [])
 
+  useEffect(() => {
+  notificationService.requestPermission()
+}, [])
   const loadAll = async () => {
     try {
       setLoading(true)
@@ -97,7 +99,85 @@ export default function Dashboard() {
       setLoading(false)
     }
   }
+  useEffect(() => {
+  const currentMonth = new Date().getMonth()
 
+  const savedMonth =
+    localStorage.getItem(
+      'notification-month'
+    )
+
+  if (
+    savedMonth === null ||
+    Number(savedMonth) !== currentMonth
+  ) {
+    localStorage.removeItem(
+      'budget-notified-75'
+    )
+
+    localStorage.removeItem(
+      'budget-notified-90'
+    )
+
+    localStorage.removeItem(
+      'budget-notified-100'
+    )
+
+    localStorage.setItem(
+      'notification-month',
+      currentMonth
+    )
+  }
+}, [])
+useEffect(() => {
+  if (!summary?.budgetInfo) return
+
+  const usage = Math.floor(
+    summary.budgetInfo.usagePercent || 0
+  )
+
+  const notified75 =
+    localStorage.getItem(
+      'budget-notified-75'
+    )
+
+  const notified90 =
+    localStorage.getItem(
+      'budget-notified-90'
+    )
+
+  const notified100 =
+    localStorage.getItem(
+      'budget-notified-100'
+    )
+
+  if (usage >= 75 && !notified75) {
+    notificationService.budgetAlert(75)
+
+    localStorage.setItem(
+      'budget-notified-75',
+      'true'
+    )
+  }
+
+  if (usage >= 90 && !notified90) {
+    notificationService.budgetAlert(90)
+
+    localStorage.setItem(
+      'budget-notified-90',
+      'true'
+    )
+  }
+
+  if (usage >= 100 && !notified100) {
+    notificationService.budgetAlert(100)
+
+    localStorage.setItem(
+      'budget-notified-100',
+      'true'
+    )
+  }
+}, [summary])
   if (loading) {
     return (
       <div className="text-center py-20 text-slate-500">

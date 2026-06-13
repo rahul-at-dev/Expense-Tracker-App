@@ -10,6 +10,7 @@ import Reports from './pages/Reports'
 import authService from './services/authService'
 import './App.css'
 import Toast, { toast } from './components/Toast'
+import notificationService from './services/notificationService'
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -29,7 +30,9 @@ function App() {
     }
     setLoading(false)
   }, [])
-
+  useEffect(() => {
+  notificationService.checkDailyReminder()
+}, [isAuthenticated])
   const handleLoginSuccess = () => {
     const user = authService.getCurrentUser()
     setCurrentUser(user)
