@@ -37,9 +37,14 @@ export default function Dashboard() {
   useEffect(() => {
     loadAll()
   }, [])
+// console.log('Budget Info:', summary?.budgetInfo)
+// console.log('Usage Percent:', summary?.budgetInfo?.usagePercent)
+ useEffect(() => {
+  const initNotifications = async () => {
+    await notificationService.requestPermission()
+  }
 
-  useEffect(() => {
-  notificationService.requestPermission()
+  initNotifications()
 }, [])
   const loadAll = async () => {
     try {
@@ -150,6 +155,15 @@ useEffect(() => {
     localStorage.getItem(
       'budget-notified-100'
     )
+    console.log(
+  'Permission:',
+  Notification.permission
+)
+
+console.log(
+  'Budget Usage:',
+  usage
+)
 
   if (usage >= 75 && !notified75) {
     notificationService.budgetAlert(75)
